@@ -1,0 +1,15 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: grafana-dashboards
+spec:
+  dependsOn:
+    - name: loki-stack
+    - name: prometheus
+  interval: 10m0s
+  path: ./clusters/kind-cluster/observability/observability-config
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system

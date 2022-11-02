@@ -1,0 +1,59 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: fluent-bit
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: fluent-bit
+      sourceRef:
+        kind: HelmRepository
+        name: fluent-charts
+      interval: 60m
+  # https://github.com/fluent/helm-charts/blob/main/charts/fluent-bit/values.yaml
+  values:
+    image:
+      tag: "2.0"
+    config:
+      extraFiles:
+        kube.json: |
+          {
+            "kubernetes": {
+              "container_name": "container",
+              "host": "node",
+              "labels": {
+                "app": "app",
+                "release": "release"
+              },
+              "namespace_name": "namespace"
+            }
+          }
+      filters: |
+        [FILTER]
+            Name kubernetes
+            Match kube.*
+            Merge_Log On
+            Keep_Log Off
+            K8S-Logging.Parser Off
+            K8S-Logging.Exclude Off
+            Annotations Off
+        [FILTER]
+            Name modify
+            Match      *
+            Add level  info
+            Add stream stdout
+      outputs: |
+        [OUTPUT]
+            name           loki
+            match          kube.*
+            host           loki-stack-headless
+            label_map_path /fluent-bit/etc/kube.json
+            remove_keys    _p, kubernetes, stream, level
+            label_keys     $stream, $level
+        [OUTPUT]
+            name           loki
+            match          host.*
+            host           loki-stack-headless
+            remove_keys    _p, stream, level
+            label_keys     $stream, $level

@@ -2,24 +2,24 @@
 
 ## Create your cluster
 
-For this demo, you can use any Kubernetes cluster (1.22 - 1.25).
+For this demo, you can use any Kubernetes cluster (1.22 - 1.25), including kind clusters.
 
 You can use [kind](https://kind.sigs.k8s.io/docs/user/quick-start/) (Kubernetes in Docker) to create your cluster by running:
 
 ```sh
-kind create cluster
+kind create cluster --name oreilly-kubernetes
 ```
 
 Make sure your cluster is ready before proceeding:
 
 ```sh
 # this should return a node marked Ready
-kubectl get nodes
+kubectl get nodes --watch
 ```
 
 ## Bootstrap Flux to your cluster
 
-Install the Flux CLI
+Install the Flux CLI:
 
 ```sh
 brew install fluxcd/tap/flux
@@ -38,6 +38,37 @@ flux bootstrap github \
   --path=./clusters/kind-cluster \
   --token-auth \
   --personal
+```
+
+The output from the bootstrap should look as possible:
+
+```sh
+► connecting to github.com
+► cloning branch "main" from Git repository "https://github.com/tiffanywang3/oreilly-kubernetes.git"
+✔ cloned repository
+► generating component manifests
+✔ generated component manifests
+✔ component manifests are up to date
+► installing components in "flux-system" namespace
+✔ installed components
+✔ reconciled components
+► determining if source secret "flux-system/flux-system" exists
+► generating source secret
+► applying source secret "flux-system/flux-system"
+✔ reconciled source secret
+► generating sync manifests
+✔ generated sync manifests
+✔ sync manifests are up to date
+► applying sync manifests
+✔ reconciled sync configuration
+◎ waiting for Kustomization "flux-system/flux-system" to be reconciled
+✔ Kustomization reconciled successfully
+► confirming components are healthy
+✔ helm-controller: deployment ready
+✔ kustomize-controller: deployment ready
+✔ notification-controller: deployment ready
+✔ source-controller: deployment ready
+✔ all components are healthy
 ```
 
 Pull commits made to your repository by Flux:
@@ -68,7 +99,31 @@ Fast-forward
  create mode 100644 clusters/kind-cluster/flux-system/kustomization.yaml
 ```
 
-## Add the Weave GitOps HelmRelease + HelmRepository
+You'll also see the commits that Flux made to your repo:
+
+```sh
+git log --oneline
+```
+
+## Contents of the OReilly Kubernetes Repository
+
+This repo includes manifests from the fluxcd/flux2 GitHub repository, modified for the purposes of this presentation. You can find docs [here](https://fluxcd.io/flux/guides/monitoring/#install-flux-grafana-dashboards). 
+
+The observability stack workloads are deployed via Flux HelmReleases, which the Flux Helm Controller reconciles within your cluster. HelmReleases allow users to declaratively use Helm. 
+
+This repo includes HelmReleases, HelmRepositories, and Kustomizations for our observability stack components. We'll be using Prometheus, Grafana, Loki, Fluent Bit, and Weave GitOps. 
+
+View the Grafana dashboards:
+
+Navigate to localhost:3000, with user `admin`, and password `prom-operator`:
+```sh
+kubectl -n observability port-forward svc/kube-prometheus-stack-grafana 3000:80
+```
+
+You can browse the Grafana Dashboards and look for the ones defined in clusters/kind-cluster/observability/observability-config (Cluster Logs, Flux Cluster Stats, and Flux Control Plane).
+
+
+### Add the Weave GitOps HelmRelease + HelmRepository
 
 Install the Weave GitOps CLI
 
@@ -76,7 +131,7 @@ Install the Weave GitOps CLI
 brew install weaveworks/tap/gitops
 ```
 
-Bootstrap Weave GitOps Dashboard:
+Create the Weave GitOps Dashboard:
 
 ```sh
 # this password will be used for accessing the GitOps Dashboard
@@ -88,7 +143,7 @@ gitops create dashboard ww-gitops \
   --export > ./clusters/kind-cluster/weave-gitops-dashboard.yaml
 ```
 
-The GitOps CLI will have added a new file to the specified path; commit and push that update to your repo:
+The GitOps CLI will have added a new file to the specified path; edit the contents of the commit and push that update to your repo:
 
 ```sh
 git add .
@@ -96,7 +151,62 @@ git commit -m "Add weave gitops dashboard"
 git push
 ```
 
+We can use the Flux CLI to automatically reconcile the contents of our latest commit:
 
+```sh
+flux reconcile kustomization flux-system --with-source
+```
 
-## Create Flux Kustomizations for your Observability Stack
+Review the contents of the flux-system namespace:
+
+```sh
+kubectl get pods -n flux-system
+NAME                                       READY   STATUS    RESTARTS   AGE
+helm-controller-7d9bb444c7-2jjfl           1/1     Running   0          4m58s
+kustomize-controller-5c84554f7b-49fdc      1/1     Running   0          4m58s
+notification-controller-64695f5b65-7zrjf   1/1     Running   0          4m58s
+source-controller-7859746949-2g7bp         1/1     Running   0          4m58s
+ww-gitops-weave-gitops-6cfb57f656-2jhb9    1/1     Running   0          4s
+```
+
+Login to the GitOps Dashboard by exposing the service and using the default user (admin) and password (password):
+
+```sh
+kubectl port-forward svc/ww-gitops-weave-gitops -n flux-system 9001:9001
+```
+
+## Reproducible, Auditable, Reliably Delivered Workloads
+
+You'll notice throughout this workshop that we're never calling `kubectl apply` to deploy workloads to the cluster; all of the changes we've made to the cluster have been via Git, with Flux reconciling the desired state you've defined in Git to your running cluster.
+
+We could completely delete our cluster, create a new cluster (into which Flux is bootstrapped/deployed), and once Flux comes up successfully, all of our workloads will be deployed.
+
+You can delete your kind cluster with:
+
+```sh
+kind delete cluster --name oreilly-kubernetes
+```
+
+Once your kind cluster has been deleted, create a new one!
+
+```sh
+kind create cluster --name new-oreilly-kubernetes
+```
+
+Make sure your kind cluster is ready before re-bootstrapping Flux:
+
+```sh
+export GITHUB_USER=$YOUR_GITHUB_USER
+export GITHUB_TOKEN=$YOUR_GITHUB_TOKEN
+
+flux bootstrap github \
+  --owner=$GITHUB_USER \
+  --repository=oreilly-kubernetes \
+  --branch=main \
+  --path=./clusters/kind-cluster \
+  --token-auth \
+  --personal
+```
+
+Once Flux is pointed back to this repository, it will reconcile the workloads comprising the desired state. 
 

@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: observability
+resources:
+  - observability.namespace.yaml
+  - prometheus.kustomization.yaml
+  - fluent-bit.kustomization.yaml
+  - grafana-loki.kustomization.yaml
+  - grafana-dashboards.kustomization.yaml
