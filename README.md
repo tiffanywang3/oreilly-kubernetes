@@ -40,6 +40,34 @@ flux bootstrap github \
   --personal
 ```
 
+Pull commits made to your repository by Flux:
+
+```sh
+git pull 
+```
+
+You should see the Flux manifests got added to the path that you specified:
+
+```sh
+-> git pull
+remote: Enumerating objects: 14, done.
+remote: Counting objects: 100% (14/14), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 13 (delta 0), reused 13 (delta 0), pack-reused 0
+Unpacking objects: 100% (13/13), 29.63 KiB | 5.93 MiB/s, done.
+From https://github.com/tiffanywang3/oreilly-kubernetes
+   31d23a9..4cc7965  main       -> origin/main
+Updating 31d23a9..4cc7965
+Fast-forward
+ clusters/kind-cluster/flux-system/gotk-components.yaml | 6129 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ clusters/kind-cluster/flux-system/gotk-sync.yaml       |   27 +
+ clusters/kind-cluster/flux-system/kustomization.yaml   |    5 +
+ 3 files changed, 6161 insertions(+)
+ create mode 100644 clusters/kind-cluster/flux-system/gotk-components.yaml
+ create mode 100644 clusters/kind-cluster/flux-system/gotk-sync.yaml
+ create mode 100644 clusters/kind-cluster/flux-system/kustomization.yaml
+```
+
 ## Add the Weave GitOps HelmRelease + HelmRepository
 
 Install the Weave GitOps CLI
@@ -59,6 +87,16 @@ gitops create dashboard ww-gitops \
   --password=$PASSWORD \
   --export > ./clusters/kind-cluster/weave-gitops-dashboard.yaml
 ```
+
+The GitOps CLI will have added a new file to the specified path; commit and push that update to your repo:
+
+```sh
+git add .
+git commit -m "Add weave gitops dashboard"
+git push
+```
+
+
 
 ## Create Flux Kustomizations for your Observability Stack
 
