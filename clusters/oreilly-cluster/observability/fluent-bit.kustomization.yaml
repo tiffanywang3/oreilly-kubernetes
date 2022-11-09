@@ -4,7 +4,7 @@ metadata:
   name: fluent-bit
 spec:
   interval: 10m0s
-  path: ./clusters/kind-cluster/observability/fluent-bit
+  path: ./clusters/oreilly-cluster/observability/fluent-bit
   prune: true
   sourceRef:
     kind: GitRepository

@@ -7,7 +7,7 @@ spec:
     - name: loki-stack
     - name: prometheus
   interval: 10m0s
-  path: ./clusters/kind-cluster/observability/observability-config
+  path: ./clusters/oreilly-cluster/observability/observability-config
   prune: true
   sourceRef:
     kind: GitRepository
