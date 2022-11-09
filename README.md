@@ -10,6 +10,14 @@ You can use [kind](https://kind.sigs.k8s.io/docs/user/quick-start/) (Kubernetes 
 kind create cluster --name oreilly-kubernetes
 ```
 
+Alternatively, you can use Colima to create a local Kubernetes cluster:
+
+```sh
+brew install colima
+
+colima start --kubernetes --cpu 4 --memory 8 
+```
+
 Make sure your cluster is ready before proceeding:
 
 ```sh
@@ -40,7 +48,7 @@ flux bootstrap github \
   --personal
 ```
 
-The output from the bootstrap should look as possible:
+The output from the bootstrap should:
 
 ```sh
 ► connecting to github.com
@@ -191,6 +199,18 @@ Once your kind cluster has been deleted, create a new one!
 
 ```sh
 kind create cluster --name new-oreilly-kubernetes
+```
+
+If you are running a Colima cluster, you can stop Colima with:
+
+```sh
+colima stop
+```
+
+And to delete the Colima cluster, you can run:
+
+```sh
+colima delete
 ```
 
 Make sure your kind cluster is ready before re-bootstrapping Flux:
