@@ -42,13 +42,13 @@ export GITHUB_TOKEN=$YOUR_GITHUB_TOKEN
 flux bootstrap github \
   --owner=$GITHUB_USER \
   --repository=oreilly-kubernetes \
-  --branch=main \
-  --path=./clusters/kind-cluster \
+  --branch=oreilly-kubernetes \
+  --path=./clusters/oreilly-cluster \
   --token-auth \
   --personal
 ```
 
-The output from the bootstrap should:
+The output from the bootstrap should look like:
 
 ```sh
 ► connecting to github.com
@@ -98,13 +98,13 @@ From https://github.com/tiffanywang3/oreilly-kubernetes
    31d23a9..4cc7965  main       -> origin/main
 Updating 31d23a9..4cc7965
 Fast-forward
- clusters/kind-cluster/flux-system/gotk-components.yaml | 6129 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- clusters/kind-cluster/flux-system/gotk-sync.yaml       |   27 +
- clusters/kind-cluster/flux-system/kustomization.yaml   |    5 +
+ clusters/oreilly-cluster/flux-system/gotk-components.yaml | 6129 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ clusters/oreilly-cluster/flux-system/gotk-sync.yaml       |   27 +
+ clusters/oreilly-cluster/flux-system/kustomization.yaml   |    5 +
  3 files changed, 6161 insertions(+)
- create mode 100644 clusters/kind-cluster/flux-system/gotk-components.yaml
- create mode 100644 clusters/kind-cluster/flux-system/gotk-sync.yaml
- create mode 100644 clusters/kind-cluster/flux-system/kustomization.yaml
+ create mode 100644 clusters/oreilly-cluster/flux-system/gotk-components.yaml
+ create mode 100644 clusters/oreilly-cluster/flux-system/gotk-sync.yaml
+ create mode 100644 clusters/oreilly-cluster/flux-system/kustomization.yaml
 ```
 
 You'll also see the commits that Flux made to your repo:
@@ -128,7 +128,7 @@ Navigate to localhost:3000, with user `admin`, and password `prom-operator`:
 kubectl -n observability port-forward svc/kube-prometheus-stack-grafana 3000:80
 ```
 
-You can browse the Grafana Dashboards and look for the ones defined in clusters/kind-cluster/observability/observability-config (Cluster Logs, Flux Cluster Stats, and Flux Control Plane).
+You can browse the Grafana Dashboards and look for the ones defined in clusters/oreilly-cluster/observability/observability-config (Cluster Logs, Flux Cluster Stats, and Flux Control Plane).
 
 
 ### Add the Weave GitOps HelmRelease + HelmRepository
@@ -148,7 +148,7 @@ export PASSWORD=password
 # from the root of your repository, run the following to create the commit to add the Dashboard manifests
 gitops create dashboard ww-gitops \
   --password=$PASSWORD \
-  --export > ./clusters/kind-cluster/weave-gitops-dashboard.yaml
+  --export > ./clusters/oreilly-cluster/weave-gitops-dashboard.yaml
 ```
 
 The GitOps CLI will have added a new file to the specified path; edit the contents of the commit and push that update to your repo:
@@ -230,8 +230,8 @@ export GITHUB_TOKEN=$YOUR_GITHUB_TOKEN
 flux bootstrap github \
   --owner=$GITHUB_USER \
   --repository=oreilly-kubernetes \
-  --branch=main \
-  --path=./clusters/kind-cluster \
+  --branch=oreilly-kubernetes \
+  --path=./clusters/oreilly-cluster \
   --token-auth \
   --personal
 ```
