@@ -238,3 +238,81 @@ flux bootstrap github \
 
 Once Flux is pointed back to this repository, it will reconcile the workloads comprising the desired state. 
 
+To finish the thought from today's OReilly Superstream, the workloads came back up as expected in the new cluster:
+
+```sh
+colima start --kubernetes --cpu 4 --memory 8 --profile new-oreilly-kubernetes
+INFO[0000] starting colima [profile=new-oreilly-kubernetes] 
+INFO[0000] runtime: docker+k3s                          
+INFO[0000] preparing network ...                         context=vm
+INFO[0000] creating and starting ...                     context=vm
+INFO[0022] provisioning ...                              context=docker
+INFO[0022] starting ...                                  context=docker
+INFO[0027] provisioning ...                              context=kubernetes
+INFO[0028] downloading and installing ...                context=kubernetes
+INFO[0033] loading oci images ...                        context=kubernetes
+INFO[0037] starting ...                                  context=kubernetes
+INFO[0040] updating config ...                           context=kubernetes
+INFO[0041] Switched to context "colima-new-oreilly-kubernetes".  context=kubernetes
+INFO[0041] done                                         
+
+ﴱ colima-new-oreilly-kubernetes in oreilly-kubernetes on  oreilly-kubernetes took 41s 
+-> flux bootstrap github \
+  --owner=$GITHUB_USER \
+  --repository=oreilly-kubernetes \
+  --branch=oreilly-kubernetes \
+  --path=./clusters/oreilly-cluster \
+  --token-auth \
+  --personal
+► connecting to github.com
+► cloning branch "oreilly-kubernetes" from Git repository "https://github.com/tiffanywang3/oreilly-kubernetes.git"
+✔ cloned repository
+► generating component manifests
+✔ generated component manifests
+✔ component manifests are up to date
+► installing components in "flux-system" namespace
+✔ installed components
+✔ reconciled components
+► determining if source secret "flux-system/flux-system" exists
+► generating source secret
+► applying source secret "flux-system/flux-system"
+✔ reconciled source secret
+► generating sync manifests
+✔ generated sync manifests
+✔ sync manifests are up to date
+► applying sync manifests
+✔ reconciled sync configuration
+◎ waiting for Kustomization "flux-system/flux-system" to be reconciled
+✔ Kustomization reconciled successfully
+► confirming components are healthy
+✔ helm-controller: deployment ready
+✔ kustomize-controller: deployment ready
+✔ notification-controller: deployment ready
+✔ source-controller: deployment ready
+✔ all components are healthy
+
+ﴱ colima-new-oreilly-kubernetes in oreilly-kubernetes on  oreilly-kubernetes took 27s 
+-> kubectl config current-context 
+colima-new-oreilly-kubernetes
+
+ﴱ colima-new-oreilly-kubernetes in oreilly-kubernetes on  oreilly-kubernetes 
+-> kubectl get pods -n flux-system
+NAME                                       READY   STATUS    RESTARTS   AGE
+notification-controller-869f88fc88-7t67q   1/1     Running   0          18m
+source-controller-5495bf4d7d-bjpmk         1/1     Running   0          18m
+kustomize-controller-579b94646c-prdk4      1/1     Running   0          18m
+helm-controller-75c8fdbcbb-bqzpk           1/1     Running   0          18m
+ww-gitops-weave-gitops-5df5f54dcf-7z9xv    1/1     Running   0          18m
+
+ﴱ colima-new-oreilly-kubernetes in oreilly-kubernetes on  oreilly-kubernetes 
+-> kubectl get pods -n observability
+NAME                                                        READY   STATUS    RESTARTS   AGE
+kube-prometheus-stack-prometheus-node-exporter-nvwfq        1/1     Running   0          18m
+kube-prometheus-stack-operator-dd6577db9-xh4hc              1/1     Running   0          18m
+kube-prometheus-stack-kube-state-metrics-8578c8f896-m6d5t   1/1     Running   0          18m
+kube-prometheus-stack-grafana-c76f9445-j5clc                3/3     Running   0          18m
+prometheus-kube-prometheus-stack-prometheus-0               2/2     Running   0          18m
+loki-stack-0                                                1/1     Running   0          17m
+fluent-bit-dbqkr                                            1/1     Running   0          18m
+```
+
