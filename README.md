@@ -2,7 +2,7 @@
 
 ## Create your cluster
 
-For this demo, you can use any Kubernetes cluster (1.22 - 1.25), including kind clusters.
+For this demo, you can use any Kubernetes cluster (1.22 - 1.25), including kind and colima clusters.
 
 You can use [kind](https://kind.sigs.k8s.io/docs/user/quick-start/) (Kubernetes in Docker) to create your cluster by running:
 
@@ -15,7 +15,7 @@ Alternatively, you can use Colima to create a local Kubernetes cluster:
 ```sh
 brew install colima
 
-colima start --kubernetes --cpu 4 --memory 8 
+colima start --kubernetes --cpu 4 --memory 8 --profile oreilly-kubernetes
 ```
 
 Make sure your cluster is ready before proceeding:
@@ -195,22 +195,30 @@ You can delete your kind cluster with:
 kind delete cluster --name oreilly-kubernetes
 ```
 
-Once your kind cluster has been deleted, create a new one!
-
-```sh
-kind create cluster --name new-oreilly-kubernetes
-```
-
 If you are running a Colima cluster, you can stop Colima with:
 
 ```sh
-colima stop
+colima stop --profile oreilly-kubernetes
 ```
 
 And to delete the Colima cluster, you can run:
 
 ```sh
-colima delete
+colima delete --profile oreilly-kubernetes
+```
+
+Once your cluster has been deleted, create a new one!
+
+If you prefer kind:
+
+```sh
+kind create cluster --name new-oreilly-kubernetes
+```
+
+If you prefer colima:
+
+```sh
+colima start --kubernetes --cpu 4 --memory 8 --profile new-oreilly-kubernetes
 ```
 
 Make sure your kind cluster is ready before re-bootstrapping Flux:

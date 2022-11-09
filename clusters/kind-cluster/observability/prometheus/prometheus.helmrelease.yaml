@@ -29,5 +29,8 @@ spec:
         podMonitorSelector:
           matchLabels:
             app.kubernetes.io/component: observability
+    prometheus-node-exporter:
+      hostRootFsMount: 
+        enabled: false
     defaultRules:
       create: false
